@@ -1,0 +1,317 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { 
+  Calendar, 
+  ChevronLeft, 
+  ChevronRight,
+  Plus,
+  Clock,
+  User,
+  Phone,
+  Check,
+  X,
+  MoreHorizontal
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const weekDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+const mockAppointments = [
+  { id: 1, date: "2024-01-15", time: "10:00", client: "María García", service: "Facial Premium", status: "confirmed", phone: "4271234567" },
+  { id: 2, date: "2024-01-15", time: "11:30", client: "Laura Pérez", service: "Masaje Relajante", status: "pending", phone: "4271234568" },
+  { id: 3, date: "2024-01-15", time: "14:00", client: "Ana López", service: "Manicure Spa", status: "confirmed", phone: "4271234569" },
+  { id: 4, date: "2024-01-16", time: "09:00", client: "Carmen Ruiz", service: "Limpieza Facial", status: "confirmed", phone: "4271234570" },
+  { id: 5, date: "2024-01-17", time: "16:00", client: "Sofía Martínez", service: "Pedicure", status: "cancelled", phone: "4271234571" },
+];
+
+const AppointmentsPanel = () => {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [view, setView] = useState<"month" | "week" | "day">("month");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const month = currentDate.toLocaleString('es-MX', { month: 'long', year: 'numeric' });
+  
+  const getDaysInMonth = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const days = [];
+    
+    // Add padding for days before the first day of month
+    for (let i = 0; i < firstDay.getDay(); i++) {
+      days.push(null);
+    }
+    
+    // Add all days in month
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+      days.push(new Date(year, month, d));
+    }
+    
+    return days;
+  };
+
+  const getAppointmentsForDate = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return mockAppointments.filter(a => a.date === dateStr);
+  };
+
+  const isToday = (date: Date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  const navigateMonth = (direction: number) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + direction);
+    setCurrentDate(newDate);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "confirmed": return "bg-green-500";
+      case "pending": return "bg-yellow-500";
+      case "cancelled": return "bg-red-500";
+      default: return "bg-primary";
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "confirmed": return <span className="px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 text-xs">Confirmada</span>;
+      case "pending": return <span className="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 text-xs">Pendiente</span>;
+      case "cancelled": return <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 text-xs">Cancelada</span>;
+    }
+  };
+
+  const todayAppointments = mockAppointments.filter(a => a.date === new Date().toISOString().split('T')[0]);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white font-playfair">Citas</h1>
+          <p className="text-white/60 text-sm">Gestiona tu agenda de citas</p>
+        </div>
+        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Plus size={16} className="mr-2" />
+          Nueva Cita
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Calendar */}
+        <Card className="lg:col-span-2 bg-[#1a1a1a] border-white/10">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div className="flex items-center gap-4">
+              <CardTitle className="text-white font-playfair capitalize">{month}</CardTitle>
+              <div className="flex gap-1">
+                <Button variant="ghost" size="icon" onClick={() => navigateMonth(-1)} className="h-8 w-8 text-white/60 hover:text-white">
+                  <ChevronLeft size={18} />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => navigateMonth(1)} className="h-8 w-8 text-white/60 hover:text-white">
+                  <ChevronRight size={18} />
+                </Button>
+              </div>
+            </div>
+            <div className="flex gap-1 bg-white/5 rounded-lg p-1">
+              {["month", "week", "day"].map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setView(v as any)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
+                    view === v ? "bg-primary text-primary-foreground" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  {v === "month" ? "Mes" : v === "week" ? "Semana" : "Día"}
+                </button>
+              ))}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {/* Week header */}
+            <div className="grid grid-cols-7 gap-1 mb-2">
+              {weekDays.map(day => (
+                <div key={day} className="text-center text-xs font-semibold text-primary uppercase py-2">
+                  {day}
+                </div>
+              ))}
+            </div>
+            
+            {/* Calendar grid */}
+            <div className="grid grid-cols-7 gap-1">
+              {getDaysInMonth().map((date, index) => {
+                if (!date) {
+                  return <div key={`empty-${index}`} className="min-h-[80px] bg-black/20 rounded-lg opacity-50" />;
+                }
+                
+                const appointments = getAppointmentsForDate(date);
+                const dateStr = date.toISOString().split('T')[0];
+                const isSelected = selectedDate === dateStr;
+                
+                return (
+                  <motion.div
+                    key={dateStr}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => setSelectedDate(dateStr)}
+                    className={`min-h-[80px] p-2 rounded-lg cursor-pointer transition-colors ${
+                      isToday(date) ? "bg-primary/15 border border-primary/30" :
+                      isSelected ? "bg-white/10 border border-white/20" :
+                      "bg-white/5 hover:bg-white/10"
+                    }`}
+                  >
+                    <span className={`text-sm font-medium ${
+                      isToday(date) ? "text-primary" : "text-white"
+                    }`}>
+                      {date.getDate()}
+                    </span>
+                    <div className="mt-1 space-y-1">
+                      {appointments.slice(0, 2).map((apt, i) => (
+                        <div
+                          key={apt.id}
+                          className={`h-1.5 rounded-full ${getStatusColor(apt.status)}`}
+                        />
+                      ))}
+                      {appointments.length > 2 && (
+                        <span className="text-[10px] text-white/40">+{appointments.length - 2}</span>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Today's appointments */}
+        <Card className="bg-[#1a1a1a] border-white/10">
+          <CardHeader>
+            <CardTitle className="text-white font-playfair flex items-center gap-2">
+              <Clock size={20} className="text-primary" />
+              Citas de Hoy
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {todayAppointments.length === 0 ? (
+              <div className="text-center py-8 text-white/40">
+                <Calendar size={40} className="mx-auto mb-3 opacity-50" />
+                <p>No hay citas para hoy</p>
+              </div>
+            ) : (
+              todayAppointments.map((apt, index) => (
+                <motion.div
+                  key={apt.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`p-4 rounded-xl bg-white/5 border-l-4 ${
+                    apt.status === "confirmed" ? "border-green-500" :
+                    apt.status === "pending" ? "border-yellow-500" :
+                    "border-red-500"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-white font-medium">{apt.time}</span>
+                        {getStatusBadge(apt.status)}
+                      </div>
+                      <p className="text-white font-medium">{apt.client}</p>
+                      <p className="text-primary text-sm">{apt.service}</p>
+                      <div className="flex items-center gap-1 mt-2 text-white/40 text-xs">
+                        <Phone size={12} />
+                        {apt.phone}
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white">
+                          <MoreHorizontal size={16} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-[#1a1a1a] border-white/10">
+                        <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer">
+                          <Check size={14} className="mr-2 text-green-400" />
+                          Confirmar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer">
+                          <X size={14} className="mr-2 text-red-400" />
+                          Cancelar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer">
+                          <Phone size={14} className="mr-2 text-green-400" />
+                          WhatsApp
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* All appointments list */}
+      <Card className="bg-[#1a1a1a] border-white/10">
+        <CardHeader>
+          <CardTitle className="text-white font-playfair">Próximas Citas</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-white/5">
+                <tr>
+                  <th className="text-left text-white/60 text-xs font-medium uppercase tracking-wider p-3">Fecha</th>
+                  <th className="text-left text-white/60 text-xs font-medium uppercase tracking-wider p-3">Hora</th>
+                  <th className="text-left text-white/60 text-xs font-medium uppercase tracking-wider p-3">Cliente</th>
+                  <th className="text-left text-white/60 text-xs font-medium uppercase tracking-wider p-3">Servicio</th>
+                  <th className="text-left text-white/60 text-xs font-medium uppercase tracking-wider p-3">Estado</th>
+                  <th className="text-left text-white/60 text-xs font-medium uppercase tracking-wider p-3 w-20">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {mockAppointments.map((apt, index) => (
+                  <motion.tr
+                    key={apt.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="hover:bg-white/5"
+                  >
+                    <td className="p-3 text-white/80">{new Date(apt.date).toLocaleDateString('es-MX')}</td>
+                    <td className="p-3 text-white font-medium">{apt.time}</td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                          <span className="text-primary text-sm font-semibold">{apt.client.charAt(0)}</span>
+                        </div>
+                        <span className="text-white">{apt.client}</span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-white">{apt.service}</td>
+                    <td className="p-3">{getStatusBadge(apt.status)}</td>
+                    <td className="p-3">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white">
+                        <MoreHorizontal size={16} />
+                      </Button>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default AppointmentsPanel;
