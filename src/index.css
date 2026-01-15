@@ -2,87 +2,106 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Venus Cosmetología - Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core Venus palette - Organic greens & cream */
+    --venus-olive: 78 20% 50%;
+    --venus-olive-dark: 78 18% 40%;
+    --venus-olive-light: 78 25% 60%;
+    --venus-cream: 48 55% 92%;
+    --venus-cream-dark: 48 40% 85%;
+    --venus-sage: 75 30% 65%;
+    --venus-forest: 75 15% 22%;
+    
+    /* Semantic tokens */
+    --background: 75 12% 96%;
+    --foreground: 75 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 75 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 75 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 78 20% 50%;
+    --primary-foreground: 48 55% 95%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 48 55% 92%;
+    --secondary-foreground: 75 15% 22%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 75 10% 90%;
+    --muted-foreground: 75 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 75 30% 65%;
+    --accent-foreground: 75 15% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 75 15% 85%;
+    --input: 75 15% 88%;
+    --ring: 78 20% 50%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
+
+    /* Custom gradients */
+    --gradient-venus: linear-gradient(135deg, hsl(78 20% 50%) 0%, hsl(75 30% 65%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(75 15% 22%) 0%, hsl(78 18% 35%) 50%, hsl(75 15% 28%) 100%);
+    --gradient-cream: linear-gradient(135deg, hsl(48 55% 92%) 0%, hsl(48 40% 88%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(48 30% 97%) 100%);
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(75 15% 22% / 0.1);
+    --shadow-card: 0 8px 30px -8px hsl(75 15% 22% / 0.12);
+    --shadow-elevated: 0 20px 50px -12px hsl(75 15% 22% / 0.2);
+    --shadow-glow: 0 0 40px hsl(78 20% 50% / 0.15);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 75 15% 10%;
+    --foreground: 48 30% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 75 12% 14%;
+    --card-foreground: 48 30% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 75 12% 14%;
+    --popover-foreground: 48 30% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 78 25% 55%;
+    --primary-foreground: 75 15% 10%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 75 12% 20%;
+    --secondary-foreground: 48 30% 90%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 75 10% 18%;
+    --muted-foreground: 75 15% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 75 25% 35%;
+    --accent-foreground: 48 30% 95%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 75 10% 20%;
+    --input: 75 10% 22%;
+    --ring: 78 25% 55%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(75 15% 8%) 0%, hsl(78 15% 15%) 50%, hsl(75 12% 10%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(75 12% 16%) 0%, hsl(75 10% 12%) 100%);
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +119,52 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer components {
+  .venus-gradient {
+    background: var(--gradient-venus);
+  }
+  
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  .card-gradient {
+    background: var(--gradient-card);
+  }
+  
+  .shadow-venus {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .glass {
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: hsl(0 0% 100% / 0.7);
+    border: 1px solid hsl(0 0% 100% / 0.3);
+  }
+  
+  .dark .glass {
+    background: hsl(75 12% 14% / 0.8);
+    border: 1px solid hsl(0 0% 100% / 0.1);
+  }
+
+  .text-gradient-venus {
+    background: var(--gradient-venus);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
