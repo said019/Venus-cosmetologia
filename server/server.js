@@ -808,7 +808,7 @@ app.get('/api/wallet/apple/:cardId', async (req, res) => {
 app.use('/api/v1', appleWebService);
 
 // SPA Fallback - Verify order: This must be LAST
-app.get("*", (req, res) => {
+app.get(/^(?!\/api).+/, (req, res) => {
   res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
 
