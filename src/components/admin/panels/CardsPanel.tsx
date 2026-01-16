@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
-  Search, 
-  RefreshCw, 
-  QrCode, 
-  Star, 
+import {
+  Search,
+  RefreshCw,
+  QrCode,
+  Star,
   Phone,
   Calendar,
   MoreHorizontal,
@@ -39,14 +39,51 @@ const mockCards = [
 ];
 
 const CardsPanel = () => {
+  const [cards, setCards] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("created_at:desc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  const filteredCards = mockCards.filter(card => 
-    card.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    card.phone.includes(searchTerm)
-  );
+  // Fetch cards on mount and when filters change
+  useEffect(() => {
+    fetchCards();
+  }, [currentPage, sortBy, searchTerm]);
+
+  const fetchCards = async () => {
+    setLoading(true);
+    try {
+      const q = encodeURIComponent(searchTerm);
+      const res = await fetch(`/api/cards?page=${currentPage}&q=${q}&sortBy=${sortBy.split(':')[0]}&sortOrder=${sortBy.split(':')[1]}`);
+      const data = await res.json();
+      if (data.items) {
+        setCards(data.items);
+      }
+    } catch (error) {
+      console.error("Error fetching cards:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAction = async (action: 'stamp' | 'redeem', cardId: string) => {
+    try {
+      const url = action === 'stamp' ? `/api/cards/${cardId}/stamp` : `/api/cards/${cardId}/redeem`;
+      const res = await fetch(url, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        // Refresh cards
+        fetchCards();
+        // TODO: Show success toast
+      } else {
+        console.error("Action error:", data.error);
+      }
+    } catch (error) {
+      console.error("Action failed:", error);
+    }
+  };
+
+  const filteredCards = cards; // Filter is handled by API now
 
   return (
     <div className="space-y-6">
@@ -89,7 +126,7 @@ const CardsPanel = () => {
                 className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/40"
               />
             </div>
-            
+
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-40 bg-white/5 border-white/10 text-white">
                 <SelectValue placeholder="Ordenar por" />
@@ -106,12 +143,12 @@ const CardsPanel = () => {
               <Search size={16} className="mr-2" />
               Buscar
             </Button>
-            
+
             <Button variant="outline" size="sm" className="border-white/10 text-white hover:bg-white/5">
               <RefreshCw size={16} className="mr-2" />
               Recargar
             </Button>
-            
+
             <Button variant="ghost" size="sm" className="text-white/60 hover:text-white">
               <QrCode size={16} className="mr-2" />
               Escanear QR
@@ -159,13 +196,13 @@ const CardsPanel = () => {
                   <td className="p-4">
                     <div className="flex items-center gap-2 text-white/60">
                       <Calendar size={14} />
-                      {new Date(card.lastVisit).toLocaleDateString('es-MX')}
+                      {card.lastVisit ? new Date(card.lastVisit).toLocaleDateString('es-MX') : new Date(card.updatedAt).toLocaleDateString('es-MX')}
                     </div>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
                       <div className="flex gap-1">
-                        {Array.from({ length: card.maxStamps }).map((_, i) => (
+                        {Array.from({ length: card.maxStamps || card.max || 10 }).map((_, i) => (
                           <Star
                             key={i}
                             size={16}
@@ -174,9 +211,9 @@ const CardsPanel = () => {
                         ))}
                       </div>
                       <span className="text-white/60 text-sm ml-2">
-                        {card.stamps}/{card.maxStamps}
+                        {card.stamps}/{card.maxStamps || card.max}
                       </span>
-                      {card.stamps === card.maxStamps && (
+                      {card.stamps === (card.maxStamps || card.max) && (
                         <span className="bg-green-500/20 text-green-400 text-xs px-2 py-0.5 rounded-full">
                           ¡Premio!
                         </span>
@@ -191,7 +228,7 @@ const CardsPanel = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-[#1a1a1a] border-white/10">
-                        <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer">
+                        <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer" onClick={() => handleAction('stamp', card.id)}>
                           <Star size={14} className="mr-2" />
                           Agregar sello
                         </DropdownMenuItem>

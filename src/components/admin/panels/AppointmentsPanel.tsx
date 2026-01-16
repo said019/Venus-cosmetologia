@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
-  Calendar, 
-  ChevronLeft, 
+import {
+  Calendar,
+  ChevronLeft,
   ChevronRight,
   Plus,
   Clock,
@@ -37,30 +37,51 @@ const AppointmentsPanel = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const month = currentDate.toLocaleString('es-MX', { month: 'long', year: 'numeric' });
-  
+
   const getDaysInMonth = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const days = [];
-    
+
     // Add padding for days before the first day of month
     for (let i = 0; i < firstDay.getDay(); i++) {
       days.push(null);
     }
-    
+
     // Add all days in month
     for (let d = 1; d <= lastDay.getDate(); d++) {
       days.push(new Date(year, month, d));
     }
-    
+
     return days;
+  };
+
+  const [appointments, setAppointments] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [currentDate, view]);
+
+  const fetchAppointments = async () => {
+    try {
+      // Logic for view-based fetching could be added here, currently simplified to fetch all or by month if endpoint supports it
+      // For now we'll fetch a broad range or just use query params if supported
+      const dateStr = currentDate.toISOString().split('T')[0];
+      const res = await fetch(`/api/appointments/month?year=${currentDate.getFullYear()}&month=${currentDate.getMonth() + 1}`);
+      const data = await res.json();
+      if (data.success && data.data) {
+        setAppointments(data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    }
   };
 
   const getAppointmentsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return mockAppointments.filter(a => a.date === dateStr);
+    return appointments.filter(a => a.date === dateStr);
   };
 
   const isToday = (date: Date) => {
@@ -91,7 +112,7 @@ const AppointmentsPanel = () => {
     }
   };
 
-  const todayAppointments = mockAppointments.filter(a => a.date === new Date().toISOString().split('T')[0]);
+  const todayAppointments = appointments.filter(a => a.date === new Date().toISOString().split('T')[0]);
 
   return (
     <div className="space-y-6">
@@ -126,9 +147,8 @@ const AppointmentsPanel = () => {
                 <button
                   key={v}
                   onClick={() => setView(v as any)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                    view === v ? "bg-primary text-primary-foreground" : "text-white/60 hover:text-white"
-                  }`}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${view === v ? "bg-primary text-primary-foreground" : "text-white/60 hover:text-white"
+                    }`}
                 >
                   {v === "month" ? "Mes" : v === "week" ? "Semana" : "Día"}
                 </button>
@@ -144,32 +164,30 @@ const AppointmentsPanel = () => {
                 </div>
               ))}
             </div>
-            
+
             {/* Calendar grid */}
             <div className="grid grid-cols-7 gap-1">
               {getDaysInMonth().map((date, index) => {
                 if (!date) {
                   return <div key={`empty-${index}`} className="min-h-[80px] bg-black/20 rounded-lg opacity-50" />;
                 }
-                
+
                 const appointments = getAppointmentsForDate(date);
                 const dateStr = date.toISOString().split('T')[0];
                 const isSelected = selectedDate === dateStr;
-                
+
                 return (
                   <motion.div
                     key={dateStr}
                     whileHover={{ scale: 1.02 }}
                     onClick={() => setSelectedDate(dateStr)}
-                    className={`min-h-[80px] p-2 rounded-lg cursor-pointer transition-colors ${
-                      isToday(date) ? "bg-primary/15 border border-primary/30" :
+                    className={`min-h-[80px] p-2 rounded-lg cursor-pointer transition-colors ${isToday(date) ? "bg-primary/15 border border-primary/30" :
                       isSelected ? "bg-white/10 border border-white/20" :
-                      "bg-white/5 hover:bg-white/10"
-                    }`}
+                        "bg-white/5 hover:bg-white/10"
+                      }`}
                   >
-                    <span className={`text-sm font-medium ${
-                      isToday(date) ? "text-primary" : "text-white"
-                    }`}>
+                    <span className={`text-sm font-medium ${isToday(date) ? "text-primary" : "text-white"
+                      }`}>
                       {date.getDate()}
                     </span>
                     <div className="mt-1 space-y-1">
@@ -211,11 +229,10 @@ const AppointmentsPanel = () => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`p-4 rounded-xl bg-white/5 border-l-4 ${
-                    apt.status === "confirmed" ? "border-green-500" :
+                  className={`p-4 rounded-xl bg-white/5 border-l-4 ${apt.status === "confirmed" ? "border-green-500" :
                     apt.status === "pending" ? "border-yellow-500" :
-                    "border-red-500"
-                  }`}
+                      "border-red-500"
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -223,11 +240,11 @@ const AppointmentsPanel = () => {
                         <span className="text-white font-medium">{apt.time}</span>
                         {getStatusBadge(apt.status)}
                       </div>
-                      <p className="text-white font-medium">{apt.client}</p>
-                      <p className="text-primary text-sm">{apt.service}</p>
+                      <p className="text-white font-medium">{apt.clientName || apt.client}</p>
+                      <p className="text-primary text-sm">{apt.serviceName || apt.service}</p>
                       <div className="flex items-center gap-1 mt-2 text-white/40 text-xs">
                         <Phone size={12} />
-                        {apt.phone}
+                        {apt.clientPhone || apt.phone}
                       </div>
                     </div>
                     <DropdownMenu>
@@ -278,7 +295,7 @@ const AppointmentsPanel = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {mockAppointments.map((apt, index) => (
+                {appointments.map((apt, index) => (
                   <motion.tr
                     key={apt.id}
                     initial={{ opacity: 0 }}
@@ -291,12 +308,12 @@ const AppointmentsPanel = () => {
                     <td className="p-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary text-sm font-semibold">{apt.client.charAt(0)}</span>
+                          <span className="text-primary text-sm font-semibold">{(apt.clientName || apt.client || "C").charAt(0)}</span>
                         </div>
-                        <span className="text-white">{apt.client}</span>
+                        <span className="text-white">{apt.clientName || apt.client}</span>
                       </div>
                     </td>
-                    <td className="p-3 text-white">{apt.service}</td>
+                    <td className="p-3 text-white">{apt.serviceName || apt.service}</td>
                     <td className="p-3">{getStatusBadge(apt.status)}</td>
                     <td className="p-3">
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-white/40 hover:text-white">

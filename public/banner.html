@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Banner Registro Venus Lealtad</title>
+  <style>
+    @page {
+      size: letter portrait;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Helvetica Neue", Arial, sans-serif;
+      background: #f3f3f3;
+    }
+
+    .page {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Banner más grande (manteniendo forma casi cuadrada) */
+    .banner {
+      width: 560px;          /* antes 480 */
+      height: 760px;         /* antes 640 */
+      background: #9a9f82;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 40px 32px;  /* más padding */
+      border-radius: 24px;
+    }
+
+    .logo-circle {
+      width: 140px;      /* antes 110 */
+      height: 140px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 22px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .brand {
+      font-size: 24px;   /* antes 20 */
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .body-text {
+      font-size: 15px;   /* antes 13 */
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 22px;
+      max-width: 380px;
+    }
+
+    .qr-title {
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .qr-wrapper {
+      background: #ffffff;
+      padding: 18px;
+      border-radius: 18px;
+      margin-bottom: 16px;
+    }
+
+    .qr-wrapper img {
+      display: block;
+      width: 260px;   /* antes 210 */
+      height: 260px;
+      object-fit: contain;
+    }
+
+    .qr-caption {
+      font-size: 12px;
+      text-align: center;
+      opacity: 0.95;
+      line-height: 1.5;
+      max-width: 380px;
+      margin-bottom: 0;
+    }
+
+    @media print {
+      body {
+        background: #000;
+      }
+      .page {
+        height: auto;
+      }
+      .banner {
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="banner">
+      <!-- LOGO desde /assets/logo.png -->
+      <div class="logo-circle">
+        <img src="/assets/logo.png" alt="Venus Cosmetología" />
+      </div>
+
+      <div class="brand">Tarjeta de Lealtad</div>
+      <div class="subtitle">Regístrate con tu celular</div>
+
+      <p class="body-text">
+        Escanea el código para crear tu tarjeta de sellos digital,
+        guárdala en <strong>Apple Wallet</strong> o
+        <strong>Google Wallet</strong> y acumula beneficios en cada visita.
+      </p>
+
+      <div class="qr-title">Escanea aquí</div>
+
+      <div class="qr-wrapper">
+        <!-- QR que debe llevar a https://venus-loyalty.onrender.com -->
+        <img
+          src="/assets/venus-loyalty-qr.png"
+          alt="Escanea para registrar tu tarjeta Venus"
+        />
+      </div>
+
+      <p class="qr-caption">
+        Abre la cámara de tu celular y apunta al código para ir a<br />
+        <strong>venus-loyalty.onrender.com</strong>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

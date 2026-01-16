@@ -7,7 +7,7 @@ import venusLogo from "@/assets/venus-logo.png";
 const navLinks = [
   { href: "#inicio", label: "Inicio" },
   { href: "#servicios", label: "Servicios" },
-  { href: "#lealtad", label: "Lealtad" },
+  { href: "/registro", label: "Tarjeta Digital" },
   { href: "#testimonios", label: "Testimonios" },
   { href: "#ubicacion", label: "Ubicación" },
 ];

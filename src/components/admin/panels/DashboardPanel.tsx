@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { 
-  DollarSign, 
-  Users, 
+import {
+  DollarSign,
+  Users,
   Calendar,
   CreditCard,
   TrendingUp,
@@ -12,60 +13,78 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const stats = [
-  { 
-    label: "Ingresos del Mes", 
-    value: "$45,230", 
-    change: "+12.5%", 
-    isPositive: true,
-    icon: DollarSign,
-    color: "text-green-400",
-    bgColor: "bg-green-500/10"
-  },
-  { 
-    label: "Citas Hoy", 
-    value: "8", 
-    change: "+2", 
-    isPositive: true,
-    icon: Calendar,
-    color: "text-blue-400",
-    bgColor: "bg-blue-500/10"
-  },
-  { 
-    label: "Clientes Activos", 
-    value: "156", 
-    change: "+8", 
-    isPositive: true,
-    icon: Users,
-    color: "text-purple-400",
-    bgColor: "bg-purple-500/10"
-  },
-  { 
-    label: "Sellos Este Mes", 
-    value: "342", 
-    change: "+15%", 
-    isPositive: true,
-    icon: CreditCard,
-    color: "text-amber-400",
-    bgColor: "bg-amber-500/10"
-  },
-];
-
-const recentAppointments = [
-  { client: "María García", service: "Facial Premium", time: "10:00 AM", status: "confirmed" },
-  { client: "Laura Pérez", service: "Masaje Relajante", time: "11:30 AM", status: "pending" },
-  { client: "Ana López", service: "Manicure Spa", time: "1:00 PM", status: "confirmed" },
-  { client: "Carmen Ruiz", service: "Limpieza Facial", time: "3:30 PM", status: "confirmed" },
-];
-
-const topClients = [
-  { name: "María García", visits: 24, stamps: 8 },
-  { name: "Laura Pérez", visits: 18, stamps: 6 },
-  { name: "Ana López", visits: 15, stamps: 5 },
-  { name: "Carmen Ruiz", visits: 12, stamps: 4 },
-];
-
 const DashboardPanel = () => {
+  const [metrics, setMetrics] = useState<any>(null);
+
+  useEffect(() => {
+    fetchMetrics();
+    const interval = setInterval(fetchMetrics, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchMetrics = async () => {
+    try {
+      const res = await fetch('/api/admin/metrics');
+      const data = await res.json();
+      setMetrics(data);
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+    }
+  };
+
+  const stats = [
+    {
+      label: "Ingresos del Mes",
+      value: "$0", // TODO: Implement sales endpoint
+      change: "+0%",
+      isPositive: true,
+      icon: DollarSign,
+      color: "text-green-400",
+      bgColor: "bg-green-500/10"
+    },
+    {
+      label: "Citas Hoy",
+      value: metrics?.stampsToday?.toString() || "0",
+      change: "",
+      isPositive: true,
+      icon: Calendar,
+      color: "text-blue-400",
+      bgColor: "bg-blue-500/10"
+    },
+    {
+      label: "Total Tarjetas",
+      value: metrics?.total?.toString() || "0",
+      change: "",
+      isPositive: true,
+      icon: Users,
+      color: "text-purple-400",
+      bgColor: "bg-purple-500/10"
+    },
+    {
+      label: "Sellos Hoy",
+      value: metrics?.stampsToday?.toString() || "0",
+      change: "",
+      isPositive: true,
+      icon: CreditCard,
+      color: "text-amber-400",
+      bgColor: "bg-amber-500/10"
+    },
+  ];
+
+  const recentAppointments = [
+    { client: "María García", service: "Facial Premium", time: "10:00 AM", status: "confirmed" },
+    { client: "Laura Pérez", service: "Masaje Relajante", time: "11:30 AM", status: "pending" },
+    { client: "Ana López", service: "Manicure Spa", time: "1:00 PM", status: "confirmed" },
+    { client: "Carmen Ruiz", service: "Limpieza Facial", time: "3:30 PM", status: "confirmed" },
+  ];
+
+  const topClients = [
+    { name: "María García", visits: 24, stamps: 8 },
+    { name: "Laura Pérez", visits: 18, stamps: 6 },
+    { name: "Ana López", visits: 15, stamps: 5 },
+    { name: "Carmen Ruiz", visits: 12, stamps: 4 },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -134,11 +153,10 @@ const DashboardPanel = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-white font-medium">{apt.time}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    apt.status === 'confirmed' 
-                      ? 'bg-green-500/20 text-green-400' 
-                      : 'bg-yellow-500/20 text-yellow-400'
-                  }`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${apt.status === 'confirmed'
+                    ? 'bg-green-500/20 text-green-400'
+                    : 'bg-yellow-500/20 text-yellow-400'
+                    }`}>
                     {apt.status === 'confirmed' ? 'Confirmada' : 'Pendiente'}
                   </span>
                 </div>
@@ -164,12 +182,11 @@ const DashboardPanel = () => {
                   className="flex items-center justify-between p-3 bg-white/5 rounded-xl"
                 >
                   <div className="flex items-center gap-3">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      index === 0 ? 'bg-yellow-500 text-black' :
+                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${index === 0 ? 'bg-yellow-500 text-black' :
                       index === 1 ? 'bg-gray-400 text-black' :
-                      index === 2 ? 'bg-amber-600 text-white' :
-                      'bg-white/10 text-white'
-                    }`}>
+                        index === 2 ? 'bg-amber-600 text-white' :
+                          'bg-white/10 text-white'
+                      }`}>
                       {index + 1}
                     </span>
                     <span className="text-white text-sm">{client.name}</span>
