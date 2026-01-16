@@ -625,8 +625,16 @@ app.get('/api/cards', adminAuth, async (req, res) => {
     const limit = 12;
     const skip = (p - 1) * limit;
 
+    // Map snake_case to camelCase for Prisma
+    const fieldMap = {
+      'created_at': 'createdAt',
+      'updated_at': 'updatedAt',
+      'last_visit': 'lastVisit'
+    };
+    const mappedSortBy = fieldMap[sortBy] || sortBy || 'createdAt';
+
     const items = await CardsRepo.findAll({
-      orderBy: { [sortBy || 'createdAt']: sortOrder || 'desc' },
+      orderBy: { [mappedSortBy]: sortOrder || 'desc' },
       take: limit,
       skip
     });
