@@ -798,7 +798,7 @@ app.get('/api/wallet/apple/:cardId', async (req, res) => {
     res.set('Content-Type', 'application/vnd.apple.pkpass');
     res.set('Content-Disposition', `attachment; filename=venus-${cardId}.pkpass`);
     res.send(buffer);
-    // Server start moved to end of file after SPA fallback
+  } catch (error) {
     console.error('Apple Pass Error:', error);
     res.status(500).send('Error generating pass');
   }
@@ -807,14 +807,6 @@ app.get('/api/wallet/apple/:cardId', async (req, res) => {
 // Rutas Apple WebService (Registro/Update/Log)
 app.use('/api/v1', appleWebService);
 
-/* ========== SERVER START ========== */
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
-  console.log(`✅ Servidor Venus Loyalty (Prisma/Postgres) corriendo en puerto ${PORT}`);
-
-  // Scheduler para recordatorios
-  startScheduler();
-});
 // SPA Fallback - Verify order: This must be LAST
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../dist/index.html"));
@@ -822,7 +814,10 @@ app.get("*", (req, res) => {
 
 // START SERVER
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} (PostgreSQL/Prisma)`);
+app.listen(PORT, async () => {
+  console.log(`✅ Servidor Venus Loyalty (Prisma/Postgres) corriendo en puerto ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+
+  // Scheduler para recordatorios
+  startScheduler();
 });
