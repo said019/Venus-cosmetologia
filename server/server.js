@@ -95,7 +95,8 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static("public"));
+// Serve bundled frontend (Vite build)
+app.use(express.static(path.join(__dirname, "../dist")));
 
 // ✅ Appointments API
 app.use('/api', appointmentsRouter);
@@ -797,7 +798,7 @@ app.get('/api/wallet/apple/:cardId', async (req, res) => {
     res.set('Content-Type', 'application/vnd.apple.pkpass');
     res.set('Content-Disposition', `attachment; filename=venus-${cardId}.pkpass`);
     res.send(buffer);
-  } catch (error) {
+    // Server start moved to end of file after SPA fallback
     console.error('Apple Pass Error:', error);
     res.status(500).send('Error generating pass');
   }
@@ -813,4 +814,15 @@ app.listen(PORT, async () => {
 
   // Scheduler para recordatorios
   startScheduler();
+});
+// SPA Fallback - Verify order: This must be LAST
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
+});
+
+// START SERVER
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} (PostgreSQL/Prisma)`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
