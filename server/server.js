@@ -817,6 +817,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
   console.log(`✅ Servidor Venus Loyalty (Prisma/Postgres) corriendo en puerto ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log('Version: Fix-Syntax-Retry-1');
 
   // Scheduler para recordatorios
   startScheduler();
