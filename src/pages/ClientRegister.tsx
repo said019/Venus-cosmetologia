@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Mail, Lock, Eye, EyeOff, Phone, Calendar, ArrowRight, Gift } from "lucide-react";
+import { User, Mail, Phone, Calendar, ArrowRight, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,22 +10,19 @@ import { toast } from "sonner";
 
 const ClientRegister = () => {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     birthday: "",
-    password: "",
-    confirmPassword: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Las contraseñas no coinciden");
+    if (!formData.phone || formData.phone.length < 10) {
+      toast.error("Por favor ingresa un número de teléfono válido");
       return;
     }
     
@@ -34,10 +31,10 @@ const ClientRegister = () => {
     // Simulate registration
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    toast.success("¡Cuenta creada exitosamente! 🎉", {
-      description: "Tu tarjeta de lealtad está lista"
+    toast.success("¡Solicitud enviada! 🎉", {
+      description: "Te notificaremos cuando tu tarjeta esté lista"
     });
-    navigate("/mi-tarjeta");
+    navigate("/");
     setIsLoading(false);
   };
 
@@ -63,7 +60,7 @@ const ClientRegister = () => {
               Únete a Venus
             </h1>
             <p className="text-venus-olive-dark text-sm">
-              Crea tu cuenta y empieza a acumular recompensas
+              Registra tus datos y empieza a acumular recompensas
             </p>
           </div>
 
@@ -90,7 +87,7 @@ const ClientRegister = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-venus-forest">
-                Nombre completo
+                Nombre completo *
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-venus-olive/50" />
@@ -107,8 +104,29 @@ const ClientRegister = () => {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="phone" className="text-venus-forest">
+                Número de teléfono *
+              </Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-venus-olive/50" />
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="427 123 4567"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="pl-10 bg-white border-venus-forest/20 focus:border-venus-olive"
+                  required
+                />
+              </div>
+              <p className="text-xs text-venus-olive-dark">
+                Usarás este número para acceder a tu tarjeta
+              </p>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="email" className="text-venus-forest">
-                Correo electrónico
+                Correo electrónico (opcional)
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-venus-olive/50" />
@@ -119,89 +137,23 @@ const ClientRegister = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="pl-10 bg-white border-venus-forest/20 focus:border-venus-olive"
-                  required
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-venus-forest">
-                  Teléfono
-                </Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-venus-olive/50" />
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="427 123 4567"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="pl-10 bg-white border-venus-forest/20 focus:border-venus-olive"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="birthday" className="text-venus-forest">
-                  Cumpleaños
-                </Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-venus-olive/50" />
-                  <Input
-                    id="birthday"
-                    type="date"
-                    value={formData.birthday}
-                    onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
-                    className="pl-10 bg-white border-venus-forest/20 focus:border-venus-olive"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-venus-forest">
-                Contraseña
+              <Label htmlFor="birthday" className="text-venus-forest">
+                Fecha de cumpleaños *
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-venus-olive/50" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-venus-olive/50" />
                 <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10 pr-10 bg-white border-venus-forest/20 focus:border-venus-olive"
-                  required
-                  minLength={6}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-venus-olive/50 hover:text-venus-olive"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-venus-forest">
-                Confirmar contraseña
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-venus-olive/50" />
-                <Input
-                  id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  id="birthday"
+                  type="date"
+                  value={formData.birthday}
+                  onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
                   className="pl-10 bg-white border-venus-forest/20 focus:border-venus-olive"
                   required
-                  minLength={6}
                 />
               </div>
             </div>
@@ -215,7 +167,7 @@ const ClientRegister = () => {
                 <div className="w-5 h-5 border-2 border-venus-cream/30 border-t-venus-cream rounded-full animate-spin" />
               ) : (
                 <>
-                  Crear mi cuenta
+                  Solicitar mi tarjeta
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </>
               )}
@@ -224,9 +176,9 @@ const ClientRegister = () => {
 
           {/* Login Link */}
           <p className="text-center text-sm text-venus-olive-dark mt-6">
-            ¿Ya tienes cuenta?{" "}
+            ¿Ya tienes tarjeta?{" "}
             <Link to="/login" className="text-venus-olive font-medium hover:underline">
-              Inicia sesión
+              Ver mi tarjeta
             </Link>
           </p>
         </div>
