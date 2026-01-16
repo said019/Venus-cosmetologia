@@ -7,7 +7,8 @@ import {
   BarChart3, 
   Settings,
   Calendar,
-  X
+  X,
+  Bell
 } from "lucide-react";
 import { AdminTab } from "@/pages/Admin";
 import venusLogo from "@/assets/venus-logo.png";
@@ -19,8 +20,9 @@ interface AdminSidebarProps {
   onClose: () => void;
 }
 
-const navItems: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
+const navItems: { id: AdminTab; label: string; icon: React.ReactNode; badge?: number }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
+  { id: "requests", label: "Solicitudes", icon: <Bell size={20} />, badge: 7 },
   { id: "appointments", label: "Citas", icon: <Calendar size={20} /> },
   { id: "cards", label: "Tarjetas", icon: <CreditCard size={20} /> },
   { id: "giftcards", label: "Gift Cards", icon: <Gift size={20} /> },
@@ -71,7 +73,12 @@ const AdminSidebar = ({ activeTab, setActiveTab, isOpen, onClose }: AdminSidebar
             }`}
           >
             {item.icon}
-            <span>{item.label}</span>
+            <span className="flex-1 text-left">{item.label}</span>
+            {item.badge && item.badge > 0 && (
+              <span className="w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
+                {item.badge}
+              </span>
+            )}
             {activeTab === item.id && (
               <motion.div
                 layoutId="activeTab"

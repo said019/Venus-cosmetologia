@@ -9,8 +9,9 @@ import CatalogPanel from "@/components/admin/panels/CatalogPanel";
 import ReportsPanel from "@/components/admin/panels/ReportsPanel";
 import SettingsPanel from "@/components/admin/panels/SettingsPanel";
 import AppointmentsPanel from "@/components/admin/panels/AppointmentsPanel";
+import RequestsPanel from "@/components/admin/panels/RequestsPanel";
 
-export type AdminTab = "dashboard" | "appointments" | "cards" | "giftcards" | "catalog" | "reports" | "settings";
+export type AdminTab = "dashboard" | "requests" | "appointments" | "cards" | "giftcards" | "catalog" | "reports" | "settings";
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
@@ -20,6 +21,8 @@ const Admin = () => {
     switch (activeTab) {
       case "dashboard":
         return <DashboardPanel />;
+      case "requests":
+        return <RequestsPanel />;
       case "appointments":
         return <AppointmentsPanel />;
       case "cards":
