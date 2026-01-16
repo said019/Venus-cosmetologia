@@ -20,11 +20,14 @@ interface AdminSidebarProps {
   onClose: () => void;
 }
 
+import { Send } from "lucide-react";
+
 const navItems: { id: AdminTab; label: string; icon: React.ReactNode; badge?: number }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
   { id: "requests", label: "Solicitudes", icon: <Bell size={20} />, badge: 7 },
   { id: "appointments", label: "Citas", icon: <Calendar size={20} /> },
   { id: "cards", label: "Tarjetas", icon: <CreditCard size={20} /> },
+  { id: "notifications", label: "Notificaciones", icon: <Send size={20} /> },
   { id: "giftcards", label: "Gift Cards", icon: <Gift size={20} /> },
   { id: "catalog", label: "Catálogo", icon: <Sparkles size={20} /> },
   { id: "reports", label: "Reportes", icon: <BarChart3 size={20} /> },

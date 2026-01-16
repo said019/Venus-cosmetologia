@@ -10,8 +10,9 @@ import ReportsPanel from "@/components/admin/panels/ReportsPanel";
 import SettingsPanel from "@/components/admin/panels/SettingsPanel";
 import AppointmentsPanel from "@/components/admin/panels/AppointmentsPanel";
 import RequestsPanel from "@/components/admin/panels/RequestsPanel";
+import NotificationsPanel from "@/components/admin/panels/NotificationsPanel";
 
-export type AdminTab = "dashboard" | "requests" | "appointments" | "cards" | "giftcards" | "catalog" | "reports" | "settings";
+export type AdminTab = "dashboard" | "requests" | "appointments" | "cards" | "notifications" | "giftcards" | "catalog" | "reports" | "settings";
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<AdminTab>("dashboard");
@@ -27,6 +28,8 @@ const Admin = () => {
         return <AppointmentsPanel />;
       case "cards":
         return <CardsPanel />;
+      case "notifications":
+        return <NotificationsPanel />;
       case "giftcards":
         return <GiftCardsPanel />;
       case "catalog":
