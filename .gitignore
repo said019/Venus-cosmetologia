@@ -28,3 +28,10 @@ server/.env
 server/node_modules
 migration/
 *.db
+
+# Certificados y claves privadas
+*.pem
+*.key
+*.p12
+*.cer
+secrets/
