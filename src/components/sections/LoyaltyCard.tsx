@@ -170,7 +170,11 @@ export const LoyaltyCard = ({
           >
             <Button variant="hero" size="lg" className="w-full">
               <Gift className="w-5 h-5" />
-              Agregar a Wallet
+              Agregar a Google Wallet
+            </Button>
+            <Button variant="hero" size="lg" className="w-full mt-2">
+              <Gift className="w-5 h-5" />
+              Agregar a Apple Wallet
             </Button>
           </motion.div>
         </motion.div>

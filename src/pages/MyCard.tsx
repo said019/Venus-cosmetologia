@@ -332,7 +332,11 @@ const MyCard = () => {
                   </Link>
                   <Button variant="outline" className="w-full justify-start border-white/10 text-venus-cream hover:bg-white/5">
                     <Gift className="w-4 h-4 mr-3" />
-                    Agregar a Wallet
+                    Agregar a Google Wallet
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start border-white/10 text-venus-cream hover:bg-white/5">
+                    <Gift className="w-4 h-4 mr-3" />
+                    Agregar a Apple Wallet
                   </Button>
                   <a href="https://wa.me/5214271234567" target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" className="w-full justify-start border-white/10 text-venus-cream hover:bg-white/5">
