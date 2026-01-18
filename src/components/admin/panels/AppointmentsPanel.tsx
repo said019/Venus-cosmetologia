@@ -20,6 +20,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const weekDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
@@ -35,6 +45,14 @@ const AppointmentsPanel = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<"month" | "week" | "day">("month");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
+  const [newAppointment, setNewAppointment] = useState({
+    clientName: "",
+    clientPhone: "",
+    serviceName: "",
+    date: "",
+    time: "",
+  });
 
   const month = currentDate.toLocaleString('es-MX', { month: 'long', year: 'numeric' });
 
@@ -114,6 +132,36 @@ const AppointmentsPanel = () => {
 
   const todayAppointments = appointments.filter(a => a.date === new Date().toISOString().split('T')[0]);
 
+  const handleCreateAppointment = async () => {
+    try {
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newAppointment)
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        toast.success("Cita creada exitosamente");
+        setIsNewAppointmentOpen(false);
+        setNewAppointment({
+          clientName: "",
+          clientPhone: "",
+          serviceName: "",
+          date: "",
+          time: "",
+        });
+        fetchAppointments();
+      } else {
+        toast.error(data.error || "Error al crear la cita");
+      }
+    } catch (error) {
+      console.error("Error creating appointment:", error);
+      toast.error("Error al crear la cita");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
@@ -121,11 +169,96 @@ const AppointmentsPanel = () => {
           <h1 className="text-2xl font-bold text-white font-playfair">Citas</h1>
           <p className="text-white/60 text-sm">Gestiona tu agenda de citas</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Button 
+          onClick={() => setIsNewAppointmentOpen(true)}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+        >
           <Plus size={16} className="mr-2" />
           Nueva Cita
         </Button>
       </div>
+
+      {/* Dialog Nueva Cita */}
+      <Dialog open={isNewAppointmentOpen} onOpenChange={setIsNewAppointmentOpen}>
+        <DialogContent className="bg-[#1a1a1a] border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-white font-playfair">Nueva Cita</DialogTitle>
+            <DialogDescription className="text-white/60">
+              Crea una nueva cita para un cliente
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="clientName" className="text-white/80">Nombre del Cliente</Label>
+              <Input
+                id="clientName"
+                value={newAppointment.clientName}
+                onChange={(e) => setNewAppointment({ ...newAppointment, clientName: e.target.value })}
+                placeholder="Ej: María García"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+            <div>
+              <Label htmlFor="clientPhone" className="text-white/80">Teléfono</Label>
+              <Input
+                id="clientPhone"
+                value={newAppointment.clientPhone}
+                onChange={(e) => setNewAppointment({ ...newAppointment, clientPhone: e.target.value })}
+                placeholder="4271234567"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+            <div>
+              <Label htmlFor="serviceName" className="text-white/80">Servicio</Label>
+              <Input
+                id="serviceName"
+                value={newAppointment.serviceName}
+                onChange={(e) => setNewAppointment({ ...newAppointment, serviceName: e.target.value })}
+                placeholder="Ej: Facial Premium"
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="date" className="text-white/80">Fecha</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={newAppointment.date}
+                  onChange={(e) => setNewAppointment({ ...newAppointment, date: e.target.value })}
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+              <div>
+                <Label htmlFor="time" className="text-white/80">Hora</Label>
+                <Input
+                  id="time"
+                  type="time"
+                  value={newAppointment.time}
+                  onChange={(e) => setNewAppointment({ ...newAppointment, time: e.target.value })}
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsNewAppointmentOpen(false)}
+                className="border-white/10 text-white hover:bg-white/5"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleCreateAppointment}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                disabled={!newAppointment.clientName || !newAppointment.clientPhone || !newAppointment.date || !newAppointment.time}
+              >
+                Crear Cita
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Calendar */}
