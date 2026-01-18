@@ -1,16 +1,26 @@
-# Configuración de Certificados en Render
+# Configuración de Certificados en Railway/Render
 
-Para que Apple Wallet y Google Wallet funcionen correctamente en producción (Render), necesitas configurar los certificados como **secretos**.
+Para que Apple Wallet y Google Wallet funcionen correctamente en producción (Railway/Render), necesitas configurar los certificados como **secretos**.
 
 ## Paso 1: Preparar los certificados
 
 Los certificados necesarios están en la carpeta `migration/venus-loyalty/`:
 - `pass.pem` - Certificado de firma de Apple
 - `pass.key` - Clave privada del certificado
-- `wwdr.pem` - Certificado WWDR de Apple
+- `wwdr.pem` o `wwdr_rsa.pem` - Certificado WWDR de Apple (Railway usa `wwdr_rsa.pem`)
 - `google_private.pem` - Clave privada de Google (si usas archivo)
 
-## Paso 2: Agregar secretos en Render
+## Paso 2: Agregar secretos 
+
+### En Railway:
+
+1. Ve a tu proyecto en [Railway Dashboard](https://railway.app)
+2. Selecciona tu servicio
+3. Ve a la pestaña **"Variables"**
+4. Haz clic en **"+ New Variable"** y selecciona **"Add a Secret File"**
+5. Agrega cada certificado:
+
+### En Render:
 
 1. Ve a tu proyecto en [Render Dashboard](https://dashboard.render.com)
 2. Haz clic en tu Web Service
@@ -19,8 +29,8 @@ Los certificados necesarios están en la carpeta `migration/venus-loyalty/`:
 5. Agrega cada certificado:
 
 ### Apple Wallet Certificates
-
-**Secret File 1:**
+_rsa.pem` (Railway) o `/etc/secrets/wwdr.pem` (Render)
+- Contents: Copia el contenido completo del archivo `wwdr_rsa.pem` (Railway) o `wwdr.pem` (Render)
 - Filename: `/etc/secrets/pass.pem`
 - Contents: Copia el contenido completo del archivo `pass.pem`
 
@@ -30,21 +40,31 @@ Los certificados necesarios están en la carpeta `migration/venus-loyalty/`:
 
 **Secret File 3:**
 - Filename: `/etc/secrets/wwdr.pem`
-- Contents: Copia el contenido completo del archivo `wwdr.pem`
-
-### Google Wallet (Opcional si usas archivo)
-
-**Secret File 4:**
-- Filename: `/etc/secrets/google_private.pem`
-- Contents: Copia el contenido completo del archivo `google_private.pem`
-
-## Paso 3: Variables de Entorno
-
-Actualiza estas variables de entorno en Render para que apunten a las rutas correctas:
+- Contents: Copia el contenido completo dailway/Render para que apunten a las rutas correctas:
 
 ```bash
+# BASE URL (IMPORTANTE - Railway genera una automáticamente)
+BASE_URL=https://tu-proyecto.up.railway.app
+
 # Apple Wallet
 APPLE_PASS_CERT=/etc/secrets/pass.pem
+APPLE_PASS_KEY=/etc/secrets/pass.key
+APPLE_WWDR=/etc/secrets/wwdr_rsa.pem  # Railway usa wwdr_rsa.pem
+APPLE_TEAM_ID=UC97J4YGP3
+APPLE_PASS_TYPE_ID=pass.com.venusloyalty.mx
+APPLE_AUTH_TOKEN=886b992303852647cb1d4b59202e8a4c82de200f5788fd17c27ce5cc768fce1d
+
+# Google Wallet
+GOOGLE_ISSUER_ID=3388000000023035846
+GOOGLE_SA_EMAIL=venus-loyalty-sa@venus-loyalty.iam.gserviceaccount.com
+```
+
+### ⚠️ IMPORTANTE: BASE_URL
+ailway/R
+La variable `BASE_URL` NO debe estar vacía. Railway te genera una URL automática como:
+- `https://venus-cosmetologia-production.up.railway.app`
+
+Copia esa URL completa y pégala en `BASE_URL`.LE_PASS_CERT=/etc/secrets/pass.pem
 APPLE_PASS_KEY=/etc/secrets/pass.key
 APPLE_WWDR=/etc/secrets/wwdr.pem
 APPLE_TEAM_ID=tu_team_id_aqui
