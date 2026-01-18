@@ -12,7 +12,7 @@ interface LoyaltyCardProps {
 
 export const LoyaltyCard = ({
   stamps = 6,
-  totalStamps = 10,
+  totalStamps = 8,
   clientName = "María García",
 }: LoyaltyCardProps) => {
   const [showQR, setShowQR] = useState(false);
@@ -92,11 +92,10 @@ export const LoyaltyCard = ({
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ delay: index * 0.05 }}
-                      className={`aspect-square rounded-2xl flex items-center justify-center transition-all ${
-                        index < stamps
+                      className={`aspect-square rounded-2xl flex items-center justify-center transition-all ${index < stamps
                           ? "bg-venus-olive shadow-md"
                           : "bg-venus-forest/10 border-2 border-dashed border-venus-forest/30"
-                      }`}
+                        }`}
                     >
                       {index < stamps ? (
                         <Check className="w-6 h-6 text-venus-cream" />

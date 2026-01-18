@@ -16,19 +16,38 @@ const ClientLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!phone || phone.length < 10) {
-      toast.error("Por favor ingresa un número de teléfono válido");
+    // Limpiar teléfono a solo dígitos
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    if (!cleanPhone || cleanPhone.length < 10) {
+      toast.error("Por favor ingresa un número de teléfono válido (10 dígitos)");
       return;
     }
     
     setIsLoading(true);
     
-    // Simulate login verification
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success("¡Bienvenida de vuelta!");
-    navigate("/mi-tarjeta");
-    setIsLoading(false);
+    try {
+      // Buscar tarjeta por teléfono en el backend
+      const response = await fetch(`/api/public/card-by-phone?phone=${cleanPhone}`);
+      const data = await response.json();
+      
+      if (!data.success || !data.card) {
+        toast.error("No encontramos una tarjeta con ese número de teléfono");
+        setIsLoading(false);
+        return;
+      }
+      
+      // Guardar datos en localStorage para usar en MyCard.tsx
+      localStorage.setItem('venus_card', JSON.stringify(data.card));
+      
+      toast.success(`¡Bienvenida de vuelta, ${data.card.name.split(' ')[0]}!`);
+      navigate("/mi-tarjeta");
+    } catch (error) {
+      console.error('Error al buscar tarjeta:', error);
+      toast.error("Error al verificar. Intenta de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

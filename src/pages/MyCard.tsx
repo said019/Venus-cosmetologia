@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
-import { 
-  Gift, 
-  QrCode, 
-  X, 
-  Check, 
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Gift,
+  QrCode,
+  X,
+  Check,
   Calendar,
   Clock,
   User,
@@ -19,31 +19,91 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import venusLogo from "@/assets/venus-logo.png";
 
+interface CardData {
+  id: string;
+  name: string;
+  phone: string;
+  stamps: number;
+  max: number;
+  redeems: number;
+  lastVisit: string | null;
+  createdAt: string;
+}
+
+interface EventData {
+  id: string;
+  type: string;
+  createdAt: string;
+  serviceName?: string;
+}
+
 const MyCard = () => {
+  const navigate = useNavigate();
   const [showQR, setShowQR] = useState(false);
-  
-  // Mock client data
-  const client = {
-    name: "María García",
-    email: "maria@email.com",
-    phone: "427 123 4567",
-    stamps: 6,
-    totalStamps: 10,
-    memberSince: "Enero 2024",
-    totalVisits: 12,
-    nextAppointment: {
-      date: "20 Enero 2024",
-      time: "10:00 AM",
-      service: "Facial Premium"
+  const [cardData, setCardData] = useState<CardData | null>(null);
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Cargar datos del localStorage
+    const savedCard = localStorage.getItem('venus_card');
+    if (!savedCard) {
+      // Si no hay datos, redirigir al login
+      navigate('/login');
+      return;
     }
+
+    try {
+      const parsed = JSON.parse(savedCard);
+      setCardData(parsed);
+
+      // También cargar eventos si están disponibles
+      const savedEvents = localStorage.getItem('venus_card_events');
+      if (savedEvents) {
+        setEvents(JSON.parse(savedEvents));
+      }
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+      navigate('/login');
+    }
+
+    setLoading(false);
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('venus_card');
+    localStorage.removeItem('venus_card_events');
+    navigate('/');
   };
 
-  const visitHistory = [
-    { date: "15 Ene 2024", service: "Masaje Relajante", stampsEarned: 1 },
-    { date: "10 Ene 2024", service: "Manicure Spa", stampsEarned: 1 },
-    { date: "5 Ene 2024", service: "Facial Premium", stampsEarned: 1 },
-    { date: "28 Dic 2023", service: "Limpieza Facial", stampsEarned: 1 },
-  ];
+  // Datos del cliente (usar cardData o valores por defecto)
+  const client = {
+    name: cardData?.name || "Cliente",
+    phone: cardData?.phone || "",
+    stamps: cardData?.stamps || 0,
+    totalStamps: cardData?.max || 8,
+    memberSince: cardData?.createdAt
+      ? new Date(cardData.createdAt).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })
+      : "2024",
+    totalVisits: (cardData?.stamps || 0) + (cardData?.redeems || 0) * 8,
+  };
+
+  const visitHistory = events
+    .filter(e => e.type === 'stamp' || e.type === 'redeem')
+    .slice(0, 5)
+    .map(e => ({
+      date: new Date(e.createdAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }),
+      service: e.serviceName || (e.type === 'stamp' ? 'Servicio' : 'Canje de premio'),
+      stampsEarned: e.type === 'stamp' ? 1 : 0
+    }));
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-venus-forest flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-venus-cream/30 border-t-venus-cream rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-venus-forest">
@@ -136,11 +196,10 @@ const MyCard = () => {
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ delay: index * 0.05 }}
-                          className={`aspect-square rounded-2xl flex items-center justify-center transition-all ${
-                            index < client.stamps
-                              ? "bg-venus-olive shadow-md"
-                              : "bg-venus-forest/10 border-2 border-dashed border-venus-forest/30"
-                          }`}
+                          className={`aspect-square rounded-2xl flex items-center justify-center transition-all ${index < client.stamps
+                            ? "bg-venus-olive shadow-md"
+                            : "bg-venus-forest/10 border-2 border-dashed border-venus-forest/30"
+                            }`}
                         >
                           {index < client.stamps ? (
                             <Check className="w-7 h-7 text-venus-cream" />
@@ -252,43 +311,6 @@ const MyCard = () => {
 
           {/* Right Column */}
           <div className="space-y-6">
-            {/* Next Appointment */}
-            {client.nextAppointment && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-              >
-                <Card className="bg-primary/10 border-primary/30">
-                  <CardHeader>
-                    <CardTitle className="text-venus-cream font-playfair flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-primary" />
-                      Próxima Cita
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 text-venus-cream">
-                        <Calendar className="w-5 h-5 text-primary" />
-                        <span>{client.nextAppointment.date}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-venus-cream">
-                        <Clock className="w-5 h-5 text-primary" />
-                        <span>{client.nextAppointment.time}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-venus-cream">
-                        <Sparkles className="w-5 h-5 text-primary" />
-                        <span>{client.nextAppointment.service}</span>
-                      </div>
-                    </div>
-                    <Button className="w-full mt-4 bg-primary hover:bg-primary/90 text-primary-foreground">
-                      Reprogramar
-                    </Button>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-
             {/* Quick Actions */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -341,16 +363,13 @@ const MyCard = () => {
                     <span className="text-venus-cream">{client.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-venus-cream/60">Email</span>
-                    <span className="text-venus-cream">{client.email}</span>
-                  </div>
-                  <div className="flex justify-between">
                     <span className="text-venus-cream/60">Teléfono</span>
                     <span className="text-venus-cream">{client.phone}</span>
                   </div>
-                  <Button variant="ghost" className="w-full text-primary hover:bg-primary/10 mt-2">
-                    Editar Perfil
-                  </Button>
+                  <div className="flex justify-between">
+                    <span className="text-venus-cream/60">Miembro desde</span>
+                    <span className="text-venus-cream">{client.memberSince}</span>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -372,9 +391,9 @@ const MyCard = () => {
                     <br />
                     San Juan del Río, Qro. 76800
                   </p>
-                  <a 
-                    href="https://maps.google.com" 
-                    target="_blank" 
+                  <a
+                    href="https://maps.google.com"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block mt-3 text-primary text-sm hover:underline"
                   >

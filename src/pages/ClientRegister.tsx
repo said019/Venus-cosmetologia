@@ -20,17 +20,17 @@ const ClientRegister = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.phone || formData.phone.length < 10) {
       toast.error("Por favor ingresa un número de teléfono válido");
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     // Simulate registration
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     toast.success("¡Solicitud enviada! 🎉", {
       description: "Te notificaremos cuando tu tarjeta esté lista"
     });
@@ -76,7 +76,7 @@ const ClientRegister = () => {
                 </h3>
                 <ul className="text-xs text-venus-olive-dark space-y-1 mt-1">
                   <li>• Acumula sellos con cada visita</li>
-                  <li>• Servicio gratis al completar 10 sellos</li>
+                  <li>• Servicio gratis al completar 8 sellos</li>
                   <li>• Sorpresa especial en tu cumpleaños</li>
                 </ul>
               </div>
@@ -185,7 +185,7 @@ const ClientRegister = () => {
 
         {/* Back to home */}
         <div className="text-center mt-6">
-          <Link 
+          <Link
             to="/"
             className="text-venus-cream/70 hover:text-venus-cream text-sm transition-colors"
           >

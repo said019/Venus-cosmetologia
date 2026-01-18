@@ -117,6 +117,51 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// 📱 Endpoint público - Buscar tarjeta por teléfono (para login de clientes)
+app.get('/api/public/card-by-phone', async (req, res) => {
+  try {
+    const { phone } = req.query;
+
+    if (!phone) {
+      return res.json({ success: false, error: 'Teléfono requerido' });
+    }
+
+    // Limpiar teléfono a solo dígitos
+    const cleanPhone = phone.replace(/\D/g, '');
+
+    // Buscar tarjeta por teléfono
+    const cards = await CardsRepo.search(cleanPhone);
+
+    if (!cards || cards.length === 0) {
+      return res.json({ success: false, error: 'No encontrado' });
+    }
+
+    // Devolver la primera tarjeta que coincida
+    const card = cards[0];
+
+    // Buscar historial de eventos/visitas recientes
+    const events = await EventsRepo.findByCardId(card.id);
+
+    res.json({
+      success: true,
+      card: {
+        id: card.id,
+        name: card.name,
+        phone: card.phone,
+        stamps: card.stamps,
+        max: card.max || 8,
+        redeems: card.redeems || 0,
+        lastVisit: card.lastVisit,
+        createdAt: card.createdAt
+      },
+      recentEvents: events.slice(0, 10) // Últimos 10 eventos
+    });
+  } catch (error) {
+    console.error('Error buscando tarjeta por teléfono:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // 🧪 Test endpoint para WhatsApp
 app.post('/api/test/whatsapp', async (req, res) => {
   try {

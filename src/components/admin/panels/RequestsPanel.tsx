@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  Calendar, 
-  CreditCard, 
-  Check, 
-  X, 
-  Clock, 
+import {
+  Calendar,
+  CreditCard,
+  Check,
+  X,
+  Clock,
   User,
   Phone,
   MessageSquare,
@@ -55,33 +55,33 @@ interface RegistrationRequest {
 }
 
 const mockAppointmentRequests: AppointmentRequest[] = [
-  { 
-    id: 1, 
-    client: "María García", 
+  {
+    id: 1,
+    client: "María García",
     phone: "427 123 4567",
-    service: "Facial Premium", 
+    service: "Facial Premium",
     requestedDate: "20 Enero 2024",
     requestedTime: "10:00 AM",
     notes: "Primera vez",
     status: "pending",
     createdAt: "Hace 5 min"
   },
-  { 
-    id: 2, 
-    client: "Laura Pérez", 
+  {
+    id: 2,
+    client: "Laura Pérez",
     phone: "427 234 5678",
-    service: "Masaje Relajante", 
+    service: "Masaje Relajante",
     requestedDate: "21 Enero 2024",
     requestedTime: "3:00 PM",
     notes: "",
     status: "pending",
     createdAt: "Hace 15 min"
   },
-  { 
-    id: 3, 
-    client: "Ana López", 
+  {
+    id: 3,
+    client: "Ana López",
     phone: "427 345 6789",
-    service: "Manicure Spa", 
+    service: "Manicure Spa",
     requestedDate: "22 Enero 2024",
     requestedTime: "11:00 AM",
     notes: "Prefiere color rosa",
@@ -91,18 +91,18 @@ const mockAppointmentRequests: AppointmentRequest[] = [
 ];
 
 const mockStampRequests: StampRequest[] = [
-  { 
-    id: 1, 
-    client: "Carmen Ruiz", 
+  {
+    id: 1,
+    client: "Carmen Ruiz",
     phone: "427 456 7890",
     currentStamps: 9,
     service: "Limpieza Facial",
     requestedAt: "Hace 2 min",
     status: "pending"
   },
-  { 
-    id: 2, 
-    client: "Sofía Martínez", 
+  {
+    id: 2,
+    client: "Sofía Martínez",
     phone: "427 567 8901",
     currentStamps: 5,
     service: "Pedicure",
@@ -112,18 +112,18 @@ const mockStampRequests: StampRequest[] = [
 ];
 
 const mockRegistrationRequests: RegistrationRequest[] = [
-  { 
-    id: 1, 
-    name: "Elena Torres", 
+  {
+    id: 1,
+    name: "Elena Torres",
     email: "elena@email.com",
     phone: "427 678 9012",
     birthday: "15 de Mayo",
     registeredAt: "Hace 3 min",
     status: "pending"
   },
-  { 
-    id: 2, 
-    name: "Patricia Sánchez", 
+  {
+    id: 2,
+    name: "Patricia Sánchez",
     email: "patricia@email.com",
     phone: "427 789 0123",
     birthday: "22 de Agosto",
@@ -139,42 +139,42 @@ const RequestsPanel = () => {
   const [registrationRequests, setRegistrationRequests] = useState(mockRegistrationRequests);
 
   const handleApproveAppointment = (id: number) => {
-    setAppointmentRequests(prev => 
+    setAppointmentRequests(prev =>
       prev.map(req => req.id === id ? { ...req, status: "approved" as const } : req)
     );
     toast.success("Cita aprobada y confirmada");
   };
 
   const handleRejectAppointment = (id: number) => {
-    setAppointmentRequests(prev => 
+    setAppointmentRequests(prev =>
       prev.map(req => req.id === id ? { ...req, status: "rejected" as const } : req)
     );
     toast.info("Cita rechazada");
   };
 
   const handleApproveStamp = (id: number) => {
-    setStampRequests(prev => 
+    setStampRequests(prev =>
       prev.map(req => req.id === id ? { ...req, status: "approved" as const } : req)
     );
     toast.success("Sello agregado exitosamente");
   };
 
   const handleRejectStamp = (id: number) => {
-    setStampRequests(prev => 
+    setStampRequests(prev =>
       prev.map(req => req.id === id ? { ...req, status: "rejected" as const } : req)
     );
     toast.info("Solicitud de sello rechazada");
   };
 
   const handleApproveRegistration = (id: number) => {
-    setRegistrationRequests(prev => 
+    setRegistrationRequests(prev =>
       prev.map(req => req.id === id ? { ...req, status: "approved" as const } : req)
     );
     toast.success("Cliente registrado y tarjeta creada");
   };
 
   const handleRejectRegistration = (id: number) => {
-    setRegistrationRequests(prev => 
+    setRegistrationRequests(prev =>
       prev.map(req => req.id === id ? { ...req, status: "rejected" as const } : req)
     );
     toast.info("Registro rechazado");
@@ -251,8 +251,8 @@ const RequestsPanel = () => {
       {/* Tabs */}
       <Tabs defaultValue="appointments" className="space-y-6">
         <TabsList className="bg-white/5 border border-white/10">
-          <TabsTrigger 
-            value="appointments" 
+          <TabsTrigger
+            value="appointments"
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2"
           >
             <Calendar size={16} />
@@ -263,7 +263,7 @@ const RequestsPanel = () => {
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="stamps"
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2"
           >
@@ -275,7 +275,7 @@ const RequestsPanel = () => {
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger 
+          <TabsTrigger
             value="registrations"
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2"
           >
@@ -390,16 +390,14 @@ const RequestsPanel = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className={`bg-[#1a1a1a] border-white/10 border-l-4 ${
-                  request.currentStamps === 9 ? 'border-l-yellow-500' : 'border-l-primary'
-                }`}>
+                <Card className={`bg-[#1a1a1a] border-white/10 border-l-4 ${request.currentStamps === 7 ? 'border-l-yellow-500' : 'border-l-primary'
+                  }`}>
                   <CardContent className="p-5">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex items-start gap-4">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          request.currentStamps === 9 ? 'bg-yellow-500/20' : 'bg-primary/20'
-                        }`}>
-                          {request.currentStamps === 9 ? (
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${request.currentStamps === 7 ? 'bg-yellow-500/20' : 'bg-primary/20'
+                          }`}>
+                          {request.currentStamps === 7 ? (
                             <Gift className="w-6 h-6 text-yellow-400" />
                           ) : (
                             <Stamp className="w-6 h-6 text-primary" />
@@ -416,13 +414,12 @@ const RequestsPanel = () => {
                               <Phone size={14} />
                               {request.phone}
                             </span>
-                            <span className={`text-sm font-medium ${
-                              request.currentStamps === 9 ? 'text-yellow-400' : 'text-white/60'
-                            }`}>
-                              {request.currentStamps}/10 sellos
+                            <span className={`text-sm font-medium ${request.currentStamps === 7 ? 'text-yellow-400' : 'text-white/60'
+                              }`}>
+                              {request.currentStamps}/8 sellos
                             </span>
                           </div>
-                          {request.currentStamps === 9 && (
+                          {request.currentStamps === 7 && (
                             <p className="text-yellow-400 text-sm mt-2 flex items-center gap-1">
                               🎉 ¡Con este sello completa la tarjeta!
                             </p>
