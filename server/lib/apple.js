@@ -22,6 +22,16 @@ function getPassClass() {
 
 /* =============== Helpers de lectura PEM =============== */
 function readPemString(filePath, label) {
+  // Primero intentar leer desde variable de entorno base64 (Railway)
+  const envVarName = label.replace(/\(|\)/g, '').replace(/\s+/g, '_').toUpperCase() + '_BASE64';
+  const base64Content = process.env[envVarName];
+  
+  if (base64Content) {
+    console.log(`[Apple Wallet] Leyendo ${label} desde variable de entorno ${envVarName}`);
+    return Buffer.from(base64Content, 'base64').toString('utf8');
+  }
+
+  // Si no hay variable base64, intentar leer archivo
   if (!filePath) throw new Error(`[Apple Wallet] Falta ruta para ${label}`);
   if (!fs.existsSync(filePath)) {
     throw new Error(`[Apple Wallet] No existe ${label} en: ${filePath}`);
@@ -40,6 +50,16 @@ function readPemString(filePath, label) {
 }
 
 function readText(filePath, label) {
+  // Primero intentar leer desde variable de entorno base64 (Railway)
+  const envVarName = label.replace(/\(|\)/g, '').replace(/\s+/g, '_').toUpperCase() + '_BASE64';
+  const base64Content = process.env[envVarName];
+  
+  if (base64Content) {
+    console.log(`[Apple Wallet] Leyendo ${label} desde variable de entorno ${envVarName}`);
+    return Buffer.from(base64Content, 'base64').toString('utf8');
+  }
+
+  // Si no hay variable base64, intentar leer archivo
   if (!filePath) throw new Error(`[Apple Wallet] Falta ruta para ${label}`);
   if (!fs.existsSync(filePath)) {
     throw new Error(`[Apple Wallet] No existe ${label} en: ${filePath}`);
